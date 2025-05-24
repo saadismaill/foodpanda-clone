@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodPanda Clone Customer & Admin App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="shared/styles.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+
+        .btn {
+            background-color: rgb(241, 39, 177);
+            color: white;
+            border-color: rgb(241, 39, 177);
+
+        }
+
+        .btn:hover {
+            background-color: rgb(224, 51, 146);
+            color: white;
+            border-color: rgb(241, 39, 177);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="http://127.0.0.1:5500/index.html">
+                <img src="shared/images/logo.png" height="30" alt="FoodPanda Logo">
+            </a>
+            <div class="d-flex">
+                <a href="admin/index.html" class="btn btn-outline-primary me-2">Admin Login</a>
+                <a href="customer/index.html" class="btn btn-outline-primary">Customer Login</a>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="hero-section">
+        <div>
+            <h1 class="display-4">Food Panda Delivery App</h1>
+            <p class="lead">Order your favorite food from local restaurants</p>
+            <a href="customer/index.html" class="btn btn-primary btn-lg">Order Now</a>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">For Customers</h3>
+                        <p class="card-text">Browse restaurants, order food, and get it delivered to your doorstep.</p>
+                        <a href="customer/index.html" class="btn btn-primary">Customer Login</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">For Restaurants</h3>
+                        <p class="card-text">Manage your menu, categories, and receive orders from customers.</p>
+                        <a href="admin/index.html" class="btn btn-primary">Admin Login</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">Features</h3>
+                        <ul class="text-start text-center">
+                            <li>User Authentication</li>
+                            <li>Menu Management</li>
+                            <li>Shopping Cart</li>
+                            <li>Checkout Process</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p>&copy; 2025 FoodPanda Delivery App. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

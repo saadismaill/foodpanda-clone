@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Login - FoodPanda</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="../shared/styles.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: url('https://images.unsplash.com/photo-1600891964599-f61ba0e24092?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+            padding: 20px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            background-color: white;
+        }
+
+        .btn-pink {
+            background-color: rgb(241, 39, 177);
+            border-color: rgb(241, 39, 177);
+            color: white;
+        }
+
+        .btn-pink:hover {
+            background-color: rgb(224, 51, 146);
+            border-color: rgb(224, 51, 146);
+            color: white;
+        }
+
+        input.form-control {
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="card p-4">
+            <div class="text-center mb-4">
+                <img src="../shared/images/logo.png" height="50" alt="FoodPanda Logo">
+            </div>
+            <h2 class="text-center mb-4">Customer Login</h2>
+
+            <div id="loginForm">
+                <div class="mb-3">
+                    <input type="email" id="customerEmail" class="form-control" placeholder="Email">
+                </div>
+                <div class="mb-3">
+                    <input type="password" id="customerPassword" class="form-control" placeholder="Password">
+                </div>
+                <button onclick="customerLogin()" class="btn btn-pink w-100">Login</button>
+                <p class="text-center mt-3">New customer? <a href="#" onclick="showSignup()">Sign up here</a></p>
+            </div>
+
+            <div id="signupForm" style="display: none;">
+                <div class="mb-3">
+                    <input type="text" id="customerName" class="form-control" placeholder="Full Name">
+                </div>
+                <div class="mb-3">
+                    <input type="email" id="newCustomerEmail" class="form-control" placeholder="Email">
+                </div>
+                <div class="mb-3">
+                    <input type="password" id="newCustomerPassword" class="form-control" placeholder="Password">
+                </div>
+                <button onclick="customerSignup()" class="btn btn-pink w-100">Create Account</button>
+                <p class="text-center mt-3">Already have an account? <a href="#" onclick="showLogin()">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function showSignup() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+        }
+
+        function showLogin() {
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        function customerSignup() {
+            const name = document.getElementById('customerName').value.trim();
+            const email = document.getElementById('newCustomerEmail').value.trim().toLowerCase();
+            const password = document.getElementById('newCustomerPassword').value;
+
+            if (!name || !email || !password) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'All fields required!',
+                    confirmButtonColor: 'rgb(241, 39, 177)'
+                });
+                return;
+            }
+
+            let customers = JSON.parse(localStorage.getItem('customers')) || [];
+
+            const existingCustomer = customers.find(c => c.email === email);
+            if (existingCustomer) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Email already registered!',
+                    confirmButtonColor: 'rgb(241, 39, 177)'
+                });
+                return;
+            }
+
+            const newCustomer = {
+                id: Date.now(),
+                name,
+                email,
+                password
+            };
+
+            customers.push(newCustomer);
+            localStorage.setItem('customers', JSON.stringify(customers));
+            localStorage.setItem('currentCustomer', JSON.stringify(newCustomer));
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Account created!',
+                text: 'Redirecting to restaurants...',
+                confirmButtonColor: 'rgb(241, 39, 177)'
+            }).then(() => {
+                window.location.href = 'restaurants.html';
+            });
+        }
+
+        function customerLogin() {
+            const email = document.getElementById('customerEmail').value.trim().toLowerCase();
+            const password = document.getElementById('customerPassword').value;
+
+            if (!email || !password) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Please enter email and password!',
+                    confirmButtonColor: 'rgb(241, 39, 177)'
+                });
+                return;
+            }
+
+            const customers = JSON.parse(localStorage.getItem('customers')) || [];
+            const existingCustomer = customers.find(c => c.email === email && c.password === password);
+
+            if (existingCustomer) {
+                localStorage.setItem('currentCustomer', JSON.stringify(existingCustomer));
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login successful!',
+                    text: 'Redirecting to restaurants...',
+                    confirmButtonColor: 'rgb(241, 39, 177)'
+                }).then(() => {
+                    window.location.href = 'restaurants.html';
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid credentials!',
+                    confirmButtonColor: 'rgb(241, 39, 177)'
+                });
+            }
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menu - FoodPanda</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+    <link href="../shared/styles.css" rel="stylesheet" />
+    <link href="style.css" rel="stylesheet" />
+    <style>
+        .navbar-custom {
+            background-color: rgb(241, 39, 177);
+        }
+
+        .btn-primary,
+        .btn-outline-primary {
+            border-color: rgb(241, 39, 177);
+            background-color: rgb(241, 39, 177);
+            color: white;
+        }
+
+        .btn-outline-primary {
+            background-color: white;
+            color: rgb(241, 39, 177);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: rgb(241, 39, 177);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="#">FoodPanda</a>
+            <div class="d-flex">
+                <a href="cart.html" class="btn btn-light position-relative me-2">
+                    Cart
+                    <span id="cartCount"
+                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                </a>
+                <button class="btn btn-light" onclick="goBack()">Back to Restaurants</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 id="restaurantName" class="mb-4"></h2>
+        <div id="menuContainer">
+            <!-- Menu items will be loaded here -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const customer = JSON.parse(localStorage.getItem("currentCustomer"));
+            if (!customer) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            updateCartCount();
+            loadMenu();
+        });
+
+        function goBack() {
+            window.location.href = "restaurants.html";
+        }
+
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem("currentCart")) || [];
+            document.getElementById("cartCount").textContent = cart.reduce(
+                (total, item) => total + item.quantity,
+                0
+            );
+        }
+
+        function loadMenu() {
+            const restaurantId = localStorage.getItem("currentRestaurant");
+            const restaurants = JSON.parse(localStorage.getItem("restaurants")) || [];
+            const restaurant = restaurants.find((r) => r.id == restaurantId);
+
+            if (!restaurant) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops!",
+                    text: "Restaurant not found!",
+                    confirmButtonColor: "rgb(241, 39, 177)",
+                }).then(() => {
+                    window.location.href = "restaurants.html";
+                });
+                return;
+            }
+
+            document.getElementById("restaurantName").textContent = restaurant.name;
+
+            const categories = JSON.parse(localStorage.getItem("categories")) || [];
+            const items = JSON.parse(localStorage.getItem("menuItems")) || [];
+
+            let html = "";
+
+            if (items.length === 0) {
+                html = "<p>No menu items found for this restaurant.</p>";
+            } else {
+                categories.forEach((cat) => {
+                    const catItems = items.filter(
+                        (item) => item.categoryId == cat.id && item.restaurantId == restaurantId
+                    );
+                    if (catItems.length > 0) {
+                        html += `
+              <div class="card mb-4">
+                <div class="card-header bg-light">
+                  <h4>${cat.name}</h4>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    ${catItems
+                                .map(
+                                    (item) => `
+                      <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                          <div class="row g-0">
+                            <div class="col-md-4">
+                              <img src="https://via.placeholder.com/150x150?text=${encodeURIComponent(
+                                        item.name
+                                    )}" class="img-fluid rounded-start" alt="${item.name}">
+                            </div>
+                            <div class="col-md-8">
+                              <div class="card-body">
+                                <h5 class="card-title">${item.name}</h5>
+                                <p class="card-text">Rs. ${item.price}</p>
+                                <p class="card-text small text-muted">${item.description}</p>
+                                <div class="d-flex align-items-center">
+                                  <button class="btn btn-sm btn-outline-primary me-2" onclick="decreaseQuantity(${item.id})">-</button>
+                                  <span id="itemQty-${item.id}">${getItemQuantity(item.id)}</span>
+                                  <button class="btn btn-sm btn-outline-primary ms-2" onclick="increaseQuantity(${item.id})">+</button>
+                                  <button class="btn btn-sm btn-primary ms-auto" onclick="addToCart(${item.id})">Add</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    `
+                                )
+                                .join("")}
+                  </div>
+                </div>
+              </div>
+            `;
+                    }
+                });
+            }
+
+            document.getElementById("menuContainer").innerHTML = html;
+        }
+
+        function getItemQuantity(itemId) {
+            const cart = JSON.parse(localStorage.getItem("currentCart")) || [];
+            const item = cart.find((i) => i.id == itemId);
+            return item ? item.quantity : 0;
+        }
+
+        function increaseQuantity(itemId) {
+            const items = JSON.parse(localStorage.getItem("menuItems")) || [];
+            const item = items.find((i) => i.id == itemId);
+
+            if (item) {
+                let cart = JSON.parse(localStorage.getItem("currentCart")) || [];
+                const existing = cart.find((i) => i.id == itemId);
+
+                if (existing) {
+                    existing.quantity += 1;
+                } else {
+                    cart.push({
+                        ...item,
+                        quantity: 1,
+                        restaurantId: localStorage.getItem("currentRestaurant"),
+                    });
+                }
+
+                localStorage.setItem("currentCart", JSON.stringify(cart));
+                document.getElementById(`itemQty-${itemId}`).textContent = getItemQuantity(itemId);
+                updateCartCount();
+            }
+        }
+
+        function decreaseQuantity(itemId) {
+            let cart = JSON.parse(localStorage.getItem("currentCart")) || [];
+            const index = cart.findIndex((i) => i.id == itemId);
+
+            if (index !== -1) {
+                if (cart[index].quantity > 1) {
+                    cart[index].quantity -= 1;
+                } else {
+                    cart.splice(index, 1);
+                }
+
+                localStorage.setItem("currentCart", JSON.stringify(cart));
+                document.getElementById(`itemQty-${itemId}`).textContent = getItemQuantity(itemId);
+                updateCartCount();
+            }
+        }
+
+        function addToCart(itemId) {
+            increaseQuantity(itemId);
+            Swal.fire({
+                icon: "success",
+                title: "Added to Cart!",
+                text: "This item has been added.",
+                timer: 1500,
+                showConfirmButton: false,
+                toast: true,
+                position: "top-end",
+                background: "#fff",
+                color: "#333",
+            });
+        }
+    </script>
+</body>
+
+</html>

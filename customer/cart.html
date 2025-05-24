@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Cart - FoodPanda</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../shared/styles.css" rel="stylesheet" />
+    <link href="style.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .bg-primary-custom {
+            background-color: rgb(241, 39, 177) !important;
+        }
+
+        .btn-primary {
+            background-color: rgb(241, 39, 177) !important;
+            border-color: rgb(241, 39, 177) !important;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary-custom">
+        <div class="container">
+            <a class="navbar-brand" href="#">FoodPanda</a>
+            <div class="d-flex">
+                <a href="cart.html" class="btn btn-light position-relative me-2">
+                    Cart
+                    <span id="cartCount"
+                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+                </a>
+                <button class="btn btn-light" onclick="goBack()">Back to Menu</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="mb-4">Your Order</h2>
+        <div id="cartItemsContainer"></div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h4 class="card-title">Order Summary</h4>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">Rs. 0</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Delivery Fee:</span>
+                    <span>Rs. 100</span>
+                </div>
+                <div class="d-flex justify-content-between fw-bold">
+                    <span>Total:</span>
+                    <span id="total">Rs. 100</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h4 class="card-title mb-4">Payment Information</h4>
+                <div class="mb-3">
+                    <label class="form-label">Card Number</label>
+                    <input type="text" class="form-control" placeholder="1234 5678 9012 3456" />
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Expiry Date</label>
+                        <input type="text" class="form-control" placeholder="MM/YY" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">CVV</label>
+                        <input type="text" class="form-control" placeholder="123" />
+                    </div>
+                </div>
+                <button class="btn btn-primary w-100 mt-3" onclick="placeOrder()">Place Order</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Sample popular restaurants setup
+            if (!localStorage.getItem('restaurants')) {
+                const sampleRestaurants = [
+                    { id: 1, name: 'McDonald\'s' },
+                    { id: 2, name: 'KFC' },
+                    { id: 3, name: 'Pizza Hut' },
+                    { id: 4, name: 'Burger Lab' },
+                    { id: 5, name: 'Domino\'s' },
+                    { id: 6, name: 'OPT Pizzeria' }
+                ];
+                localStorage.setItem('restaurants', JSON.stringify(sampleRestaurants));
+            }
+
+            const customer = JSON.parse(localStorage.getItem('currentCustomer'));
+            if (!customer) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            updateCartCount();
+            loadCartItems();
+        });
+
+        function goBack() {
+            window.location.href = 'menu.html';
+        }
+
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('currentCart')) || [];
+            document.getElementById('cartCount').textContent = cart.reduce((total, item) => total + item.quantity, 0);
+        }
+
+        function loadCartItems() {
+            const cart = JSON.parse(localStorage.getItem('currentCart')) || [];
+            const restaurantId = cart.length > 0 ? cart[0].restaurantId : null;
+            const restaurants = JSON.parse(localStorage.getItem('restaurants')) || [];
+            const restaurant = restaurants.find(r => r.id == restaurantId);
+
+            let html = '';
+
+            if (cart.length === 0) {
+                html = '<div class="alert alert-info">Your cart is empty.</div>';
+            } else {
+                html = `
+          <div class="card mb-4">
+            <div class="card-header bg-light">
+              <h4>${restaurant ? restaurant.name : 'Restaurant'}</h4>
+            </div>
+            <div class="card-body">
+              <ul class="list-group">
+                ${cart.map(item => `
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                      <h5>${item.name}</h5>
+                      <p class="mb-0">Rs. ${item.price} x ${item.quantity}</p>
+                    </div>
+                    <div class="d-flex align-items-center">
+                      <button class="btn btn-sm btn-outline-secondary me-2" onclick="decreaseQuantity(${item.id})">-</button>
+                      <span class="me-2">${item.quantity}</span>
+                      <button class="btn btn-sm btn-outline-secondary me-3" onclick="increaseQuantity(${item.id})">+</button>
+                      <button class="btn btn-sm btn-danger" onclick="removeFromCart(${item.id})">Remove</button>
+                    </div>
+                  </li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        `;
+
+                const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                const total = subtotal + 100;
+
+                document.getElementById('subtotal').textContent = `Rs. ${subtotal}`;
+                document.getElementById('total').textContent = `Rs. ${total}`;
+            }
+
+            document.getElementById('cartItemsContainer').innerHTML = html;
+        }
+
+        function removeFromCart(itemId) {
+            let cart = JSON.parse(localStorage.getItem('currentCart')) || [];
+            cart = cart.filter(item => item.id != itemId);
+            localStorage.setItem('currentCart', JSON.stringify(cart));
+            loadCartItems();
+            updateCartCount();
+        }
+
+        function increaseQuantity(itemId) {
+            let cart = JSON.parse(localStorage.getItem('currentCart')) || [];
+            const item = cart.find(i => i.id === itemId);
+            if (item) {
+                item.quantity += 1;
+                localStorage.setItem('currentCart', JSON.stringify(cart));
+                loadCartItems();
+                updateCartCount();
+            }
+        }
+
+        function decreaseQuantity(itemId) {
+            let cart = JSON.parse(localStorage.getItem('currentCart')) || [];
+            const item = cart.find(i => i.id === itemId);
+            if (item) {
+                if (item.quantity > 1) {
+                    item.quantity -= 1;
+                } else {
+                    cart = cart.filter(i => i.id !== itemId);
+                }
+                localStorage.setItem('currentCart', JSON.stringify(cart));
+                loadCartItems();
+                updateCartCount();
+            }
+        }
+
+        function placeOrder() {
+            const cart = JSON.parse(localStorage.getItem('currentCart')) || [];
+            if (cart.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops!',
+                    text: 'Your cart is empty!',
+                });
+                return;
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Order Placed!',
+                text: 'Thank you for your purchase.',
+                confirmButtonColor: 'rgb(241, 39, 177)'
+            });
+
+            localStorage.removeItem('currentCart');
+            updateCartCount();
+            loadCartItems();
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+:root {
+  --primary-color: #d70f64;
+  --primary-dark: #a10c4d;
+  --secondary-color: #f8f9fa;
+  --accent-color: #ffc107;
+  --text-dark: #2e2e2e;
+  --text-light: #6c757d;
+  --bg-light: #ffffff;
+}
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #f5f5f5;
+  color: var(--text-dark);
+}
+
+.navbar {
+  background-color: var(--primary-color) !important;
+  padding: 12px 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand img {
+  height: 32px;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  font-weight: 600;
+  padding: 10px 24px;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.form-control {
+  border-radius: 8px;
+  padding: 10px 16px;
+  border: 1px solid #e0e0e0;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.25rem rgba(215, 15, 100, 0.15);
+}
+
+.rating {
+  color: var(--accent-color);
+}
+
+.footer {
+  background-color: var(--text-dark);
+  color: white;
+  padding: 30px 0;
+}
