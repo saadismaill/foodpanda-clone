@@ -1,8 +1,9 @@
-# foodpanda-clone
+<h1>foodpanda-clone</h1> 
 
 https://myfoodpandaclone.netlify.app/
 
-ContactAuthor: Saad IsmailGitHub: saad-ismail
+ContactAuthor: Saad Ismail
+GitHub: saad-ismail
 Email: saadworkspace.co@gmail.com
 LinkedIn: 
 
